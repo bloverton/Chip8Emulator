@@ -77,7 +77,7 @@ void CPU::emulateCycle()
 		break;
 
 	case 0x3000:
-		(registers[opcode & (0x0F00 >> 8)] == (opcode & 0x00FF)) ? program_counter += 4 : program_counter += 2;
+		(registers[(opcode & 0x0F00) >> 8] == (opcode & 0x00FF)) ? program_counter += 4 : program_counter += 2;
 		break;
 
 	case 0x4000:
@@ -175,14 +175,13 @@ void CPU::emulateCycle()
 			{
 				if ((memory[index_register + yline] & (0x80 >> xline)) != 0)
 				{
-					pixelIndex = (registers[(opcode & 0x0F00) >> 8] + xline) % Graphics::SCREEN_WIDTH +
-								 ((registers[(opcode & 0x00F0) >> 4] + yline) % Graphics::SCREEN_HEIGHT) * Graphics::SCREEN_WIDTH;
+					pixelIndex = ((registers[(opcode & 0x0F00) >> 8] + xline) % Graphics::SCREEN_WIDTH) +
+								 ((registers[(opcode & 0x00F0) >> 4] + yline) % (Graphics::SCREEN_HEIGHT) * Graphics::SCREEN_WIDTH);
 					if (pixels[pixelIndex] == Graphics::COLOR_ON)
 					{
 						registers[0xF] = 1;
-						pixels[pixelIndex] = Graphics::COLOR_OFF;
 					}
-					pixels[pixelIndex] = Graphics::COLOR_ON;
+					pixels[pixelIndex] ^= Graphics::COLOR_ON;
 					drawFlag = true;
 				}
 			}
@@ -239,13 +238,13 @@ void CPU::emulateCycle()
 			break;
 
 		case 0x0029:
-			index_register = registers[(opcode & 0x0F00) >> 8] * 5;
+			index_register = registers[(opcode & 0x0F00) >> 8] * 0x5;
 			break;
 
 		case 0x0033:
 			memory[index_register] = registers[(opcode & 0x0F00) >> 8] / 100;
 			memory[index_register + 1] = (registers[(opcode & 0x0F00) >> 8] / 10) % 10;
-			memory[index_register + 2] = registers[(opcode & 0x0F00) >> 8] % 10;
+			memory[index_register + 2] = (registers[(opcode & 0x0F00) >> 8] % 100) % 10;
 			break;
 
 		case 0x0055:

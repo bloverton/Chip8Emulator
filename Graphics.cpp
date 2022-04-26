@@ -54,7 +54,7 @@ SdlReturnType Graphics::init(const std::string& windowName)
 
 void Graphics::drawDisplay(const std::vector<uint32_t>& pixels)
 {
-	SDL_UpdateTexture(texture.get(), NULL, pixels.data(), SCREEN_WIDTH * sizeof(uint32_t));
-	SDL_RenderCopy(renderer.get(), texture.get(), NULL, NULL);
+	SDL_UpdateTexture(texture.get(), nullptr, pixels.data(), SCREEN_WIDTH * sizeof(uint32_t));
+	SDL_RenderCopy(renderer.get(), texture.get(), nullptr, nullptr);
 	SDL_RenderPresent(renderer.get());
 }

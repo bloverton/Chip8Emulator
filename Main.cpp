@@ -1,6 +1,9 @@
 #include "CPU.h"
 #include "Graphics.h"
 
+#include <chrono>
+#include <thread>
+
 int main(int argc, char** argv)
 {
 	// Initialize Graphics
@@ -9,20 +12,25 @@ int main(int argc, char** argv)
 
 	// Initialize Chip8
 	std::unique_ptr<CPU> cpu(new CPU());
-	std::ifstream rom((std::filesystem::current_path().string() + "\\res\\Pong.ch8").c_str(), std::ios::binary);
+	std::ifstream rom((std::filesystem::current_path().string() + "\\res\\Space_Invader.ch8").c_str(), std::ios::binary);
 	cpu->setMemory(rom);
 
-	uint32_t startTick = 0;
-	uint32_t frameSpeed = 0;
-	SDL_Event evnt;
 	// Run Chip8
 	for (;;)
 	{
-		startTick = SDL_GetTicks();
-
+		uint32_t startTick = SDL_GetTicks64();
 		// Emulate cycle
 		cpu->emulateCycle();
 		
+		// Poll SDL Events
+		for (SDL_Event evnt; SDL_PollEvent(&evnt);)
+		{
+			if (evnt.type == SDL_QUIT)
+			{
+				return EXIT_SUCCESS;
+			}
+		}
+
 		// If draw flag is set, update screen
 		if (cpu->getDrawFlag())
 		{
@@ -31,19 +39,10 @@ int main(int argc, char** argv)
 		}
 
 		// Set Framerate
-		frameSpeed = SDL_GetTicks() - startTick;
+		uint32_t frameSpeed = SDL_GetTicks64() - startTick;
 		if (frameSpeed < (Graphics::MS_PER_CYCLE / Graphics::FPS))
 		{
 			SDL_Delay((Graphics::MS_PER_CYCLE / Graphics::FPS) - frameSpeed);
-		}
-
-		// Poll SDL Events
-		while (SDL_PollEvent(&evnt))
-		{
-			if(evnt.type == SDL_QUIT)
-			{
-				return EXIT_SUCCESS;
-			}
 		}
 	}
 	return EXIT_SUCCESS;
