@@ -20,7 +20,7 @@ class Graphics
 public:
 	static constexpr uint32_t SCREEN_WIDTH = 64;
 	static constexpr uint32_t SCREEN_HEIGHT = 32;
-	static constexpr uint32_t SCALE = 10;
+	static constexpr uint32_t SCALE = 15;
 	static constexpr uint32_t MS_PER_CYCLE = 1000;
 	static constexpr uint32_t FPS = 60;
 	static constexpr uint32_t COLOR_OFF = 0xFF000000;
